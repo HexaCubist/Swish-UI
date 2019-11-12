@@ -15,7 +15,8 @@ student id number|description|Q1 question|Q1 answer|Q2 question|Q2 answer|Qn que
 
 
 ### Q&A file processing and validation
-- [ ] Determine file size limit.
+- [x] Determine file size limit.
+  - Some investigation suggests upload filesize is around ~30MB, but that there is no clear documented limit: https://stackoverflow.com/a/8032280/3902950. Therefore, I have set the client-side limit to 15MB and added a notice that it is 15MB. 
 - [x] Provide template CSV/Excel file.
   - Here: https://github.com/HexaCubist/Swish-UI/tree/master/samples-and-templates 
 - [x] ~~Write code to convert CSV to JSON to be processble by [Swish logic](https://github.com/ron-t/Swish/tree/master/SampleCourseOfflineJSON) in [Create.js](https://github.com/ron-t/Swish/blob/master/SampleCourseOfflineJSON/Create.js) and [util.js](https://github.com/ron-t/Swish/blob/master/SampleCourseOfflineJSON/util.js)~~ (Not needed since SheetJS will convert CSV/Xls to JSON)
@@ -24,33 +25,34 @@ student id number|description|Q1 question|Q1 answer|Q2 question|Q2 answer|Qn que
 
 ## Form fields validation
 ### Step one (field upload)
-- [ ] Replace the "If you're not sure how to make this file..." part with a link to the example input files: https://github.com/ron-t/Swish/tree/master/SwishUI/samples-and-templates
-- [ ] Include advice if an Excel file is uploaded: which sheet is used (always the first one?)
+- [x] Replace the "If you're not sure how to make this file..." part with a link to the example input files: https://github.com/ron-t/Swish/tree/master/SwishUI/samples-and-templates
+- [x] Include advice if an Excel file is uploaded: which sheet is used (always the first one?)
 
 ### Token
 - [x] Must be provided.
-- [ ] Link to page with guide on how to generate a token: https://github.com/ron-t/Swish/tree/master/Documents
+- [x] Link to page with guide on how to generate a token: https://github.com/ron-t/Swish/tree/master/Documents
   - Other documentation/guides should be place here too. 
 
 ### Domain
-- [ ] Only allow 3 selectable options. Option 2 is default.
+- [x] Only allow 3 selectable options. Option 2 is default.
 1. https://canvas.auckland.ac.nz
 2. https://auckland.beta.instructure.com
 3. https://auckland.test.instructure.com
 
 ### Course ID
-- [ ] Must be numeric.
+- [x] Must be numeric.
 - ~~(?) Must be valid. Not sure if this is worth checking.~~ 
   - **Not worth checking (other errors will occur if the course id is wrong).**
   - ~~Logic would be something like an async GET call to the [Canvas API](https://canvas.auckland.ac.nz/doc/api/courses.html#method.courses.show) using the provided Token ; Endpoint: /api/v1/courses/:id ; Invalid if "unauthorised error" returned ; Valid if course data returned.~~
 
 ### Assignment title prefix
 - [x] Must be provided.
-- [ ] Impose **254** character limit.
+- [x] Impose **254** character limit.
 
 ### Number of questions
 - [x] Must be integer.
-- [ ] Should match the number of questions and answers provided in the uploaded file. Perhaps this could be automatically populated; if not, it would serve as a cross-check before submission.
+- [x] Should match the number of questions and answers provided in the uploaded file. Perhaps this could be automatically populated; if not, it would serve as a cross-check before submission.
+  - Automatically populated
 
 ### Total marks
 - [x] Must be numeric.
