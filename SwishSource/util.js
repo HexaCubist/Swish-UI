@@ -4,6 +4,8 @@ const initErrMsg = `util.js has not been initiated with a valid Canvas API acces
 Call init(token) first.`;
 
 const fs = require('fs');
+const path = require('path');
+const { EOL } = require('os'); // use Windows EOL
 
 exports.init = (token) => {
   auth = `Bearer ${token}`;
@@ -37,6 +39,17 @@ exports.nextURL = (linkText) => {
 };
 
 exports.standardArgs = () => ({ headers: getStandardHeader() });
+
+exports.newReportArgs = () => ({
+  headers: getStandardHeader(),
+  data: {
+    include: 'file',
+    quiz_report: {
+      includes_all_versions: true,
+      report_type: 'student_analysis'
+    }
+  }
+});
 
 exports.newQuizArgs = (title, description, pointsPossible, numberOfAttempts) => ({
   headers: getStandardHeader(),
@@ -86,6 +99,13 @@ exports.newQuestionArgs = (position, questionName, pointsPossible, q, a) => ({
   }
 });
 
+exports.editQuestionArgs = questionObject => ({
+  headers: getStandardHeader(),
+  data: {
+    question: questionObject
+  }
+});
+
 exports.newOverrideArgs = (lockDate, studentId) => ({
   headers: getStandardHeader(),
   data: {
@@ -107,6 +127,40 @@ exports.newPublishQuizArgs = () => ({
 });
 
 exports.loadStudentQaFile = file => JSON.parse(fs.readFileSync(file).toString());
+
+const header = {
+  fileid: 0,
+  fileName: 1,
+  url: 2,
+  auid: 3
+};
+// csv header: fileid,fileName,url,auid
+//             0      1        2   3
+const auidRE = /\d{7,9}/;
+exports.loadStudentFilesUrls = (file) => {
+  const students = {};
+  fs.readFileSync(file)
+    .toString()
+    .split(EOL) // usually generated on windows (so split on \r\n)
+    .forEach((line) => {
+      const row = line.split(',');
+      const auid = row[header.auid];
+      if (!auidRE.test(auid)) {
+        return;
+      }
+
+      const fileName = row[header.fileName];
+      const url = row[header.url];
+      students[auid] = {
+        fileName,
+        fileUrl: url
+      };
+    });
+
+  return students;
+};
+
+exports.generateIdOutputFileName = (fileName, assignmentName) => `${path.basename(fileName, '.json')}-${assignmentName}-quizIds.txt`;
 
 /**
  * @param {object} QaObject

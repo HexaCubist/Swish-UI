@@ -12,9 +12,6 @@ logs
 results
 tmp
 
-# Working files
-validation-documentation.md
-
 # Optional npm cache directory
 .npm
 
@@ -22,7 +19,7 @@ validation-documentation.md
 public/css/main.css
 .nyc_output/*
 
-# Libraries from npm packages
+#Libraries from npm packages
 public/js/lib/bootstrap.min*
 public/js/lib/jquery.min*
 public/js/lib/popper.min*
@@ -40,7 +37,6 @@ bower_components
 *.iml
 modules.xml
 *.ipr
-*.code-workspace
 
 # Temp files
 ~$*
