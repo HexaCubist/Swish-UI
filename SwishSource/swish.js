@@ -1,4 +1,5 @@
 const async = require('async');
+const fs = require('fs');
 const path = require('path');
 const RestClient = require('node-rest-client').Client;
 const util = require('./util.js');
@@ -10,10 +11,10 @@ const DefaultSettings = {
   DOMAIN: 'https://auckland.beta.instructure.com:443',
   TOKEN: 'xxxxx',
   QA_FILE: '',
-  ASSIGNMENT_TITLE: 'Assignment XXX',
+  ASSIGNMENT_TITLE: 'Files Assignment Q1-Q5',
   STARTING_Q_NUMBER: 1,
   NUMBER_OF_ATTEMPTS: 3,
-  LOCK_DATE: (new Date()).toISOString(),
+  LOCK_DATE: (new Date('2019/12/31 23:59:59')).toISOString(),
   TOTAL_MARKS_PER_QUIZ: 50,
   NUMBER_OF_QUESTIONS_PER_QUIZ: 5,
   MARKS_PER_QUESTION: this.TOTAL_MARKS_PER_QUIZ / this.NUMBER_OF_QUESTIONS_PER_QUIZ,
@@ -33,6 +34,7 @@ const SwishSource = class {
   constructor(options = {}) {
     this.settings = {};
     Object.assign(this.settings, DefaultSettings, options);
+    this.quizIds = ['assignmentId|quizId|canvasStudentId'];
     util.init(this.settings.TOKEN);
     this.client = new RestClient();
   }
@@ -47,7 +49,7 @@ const SwishSource = class {
          *    Add questions (read from .json file or as object given)
          *    Add override
          */
-    // Load dummy student questions and answers
+    // Load student questions and answers
     if (this.settings.studentsQA === {}) {
       this.handler(this.progress += 0.01, 'Loading studentsQA from disk');
       this.settings.QA_FILE = path.join(this.settings.resourcesPath, this.settings.QA_FILE);
@@ -104,6 +106,8 @@ const SwishSource = class {
         const assignmentId = data.assignment_id;
         const canvasStudentId = this.settings.studentsQA[auid].id;
 
+        this.quizIds.push(`${assignmentId}|${quizId}|${canvasStudentId}`);
+
         async.series([
           (questionsAdded) => {
             this.addQuestions(quizId, auid, questionsAdded);
@@ -131,6 +135,8 @@ const SwishSource = class {
         });
       });
     }, () => { // all students done
+      const outFile = path.join(this.settings.resourcesPath, util.generateIdOutputFileName(this.settings.QA_FILE, this.settings.ASSIGNMENT_TITLE));
+      // fs.writeFileSync(outFile, this.quizIds);
       this.handler(this.progress = 100, 'All done.');
     });
   }
